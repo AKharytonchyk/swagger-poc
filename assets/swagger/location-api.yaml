@@ -1,0 +1,304 @@
+swagger: '2.0'
+info:
+  description: Location API exposes list of Geographic Province and City information API (search by Geographical Province filter criteria).
+  version: 1.0.0
+  title: Location API
+  termsOfService: Terms of service
+  contact: {}
+  license:
+    name: Apache License Version 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+host: 'localhost:8097'
+basePath: /location-api/v1
+tags:
+  - name: country-codes-controller
+    description: Country Codes Controller
+  - name: location-controller
+    description: Location Controller
+paths:
+  /cities:
+    get:
+      tags:
+        - location-controller
+      summary: Retrieve all cities
+      operationId: getAllCitiesUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CityResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      deprecated: false
+  '/cities/{code}':
+    get:
+      tags:
+        - location-controller
+      summary: Retrieve a city by city code
+      operationId: getCityByCodeUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+        - name: code
+          in: path
+          description: code
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CityResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      deprecated: false
+  /countries:
+    get:
+      tags:
+        - country-codes-controller
+      summary: getCountries
+      operationId: getCountriesUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CountryResponse'
+      deprecated: false
+  '/countries/{alpha2}/subdivisions':
+    get:
+      tags:
+        - country-codes-controller
+      summary: getSubdivisionsByCountryCode
+      operationId: getSubdivisionsByCountryCodeUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+        - name: alpha2
+          in: path
+          description: alpha2
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SubdivisionResponse'
+      deprecated: false
+  '/ip/{ipAddress}':
+    get:
+      tags:
+        - location-controller
+      summary: Retrieve a province by ip address
+      operationId: getLocationByIpUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+        - name: ipAddress
+          in: path
+          description: ipAddress
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CityResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      deprecated: false
+  /provinces:
+    get:
+      tags:
+        - location-controller
+      summary: Retrieve all provinces
+      operationId: getAllProvincesUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/ProvinceResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      deprecated: false
+  '/provinces/{code}':
+    get:
+      tags:
+        - location-controller
+      summary: Retrieve a province by province code
+      operationId: getProvinceByCodeUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+        - name: code
+          in: path
+          description: code
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/ProvinceResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      deprecated: false
+  '/provinces/{code}/cities':
+    get:
+      tags:
+        - location-controller
+      summary: Retrieve a list of all cities within province by province code
+      operationId: getCitiesByProvinceCodeUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+        - name: code
+          in: path
+          description: code
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CityResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      deprecated: false
+definitions:
+  CityResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      ctnGroupNumber:
+        type: string
+      province:
+        $ref: '#/definitions/ProvinceResponse'
+      title:
+        type: string
+    title: CityResponse
+  CountryResponse:
+    type: object
+    properties:
+      alpha2:
+        type: string
+      name:
+        type: string
+    title: CountryResponse
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    title: ErrorResponse
+  ProvinceResponse:
+    type: object
+    properties:
+      cities:
+        type: array
+        items:
+          $ref: '#/definitions/CityResponse'
+      code:
+        type: string
+      title:
+        type: string
+    title: ProvinceResponse
+  SubdivisionResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+    title: SubdivisionResponse

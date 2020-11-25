@@ -1,0 +1,315 @@
+swagger: '2.0'
+info:
+  description: Api Documentation
+  version: '1.0'
+  title: Api Documentation
+  termsOfService: 'urn:tos'
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+host: 'localhost:8093'
+basePath: /payment-cards/v1
+tags:
+  - name: address-controller
+    description: Address Controller
+  - name: payment-controller
+    description: Payment Controller
+paths:
+  /address/validate:
+    post:
+      tags:
+        - address-controller
+      summary: validateAddress
+      operationId: validateAddressUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - in: body
+          name: addressModel
+          description: addressModel
+          required: true
+          schema:
+            $ref: '#/definitions/AddressModel'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ValidationErrorResponse'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /payment:
+    post:
+      tags:
+        - payment-controller
+      summary: makePayment
+      operationId: makePaymentUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - in: body
+          name: makePaymentRequest
+          description: makePaymentRequest
+          required: true
+          schema:
+            $ref: '#/definitions/PaymentRequest'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /payment/commit:
+    post:
+      tags:
+        - payment-controller
+      summary: commitPayment
+      operationId: commitPaymentUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - in: body
+          name: chargeOrderConfirmWithAnonymousRequest
+          description: chargeOrderConfirmWithAnonymousRequest
+          required: true
+          schema:
+            $ref: '#/definitions/ChargeOrderConfirmWithAnonymousRequest'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /payment/preparation:
+    put:
+      tags:
+        - payment-controller
+      summary: preparePayment
+      operationId: preparePaymentUsingPUT
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - in: body
+          name: chargeOrderAuthorizeWithTokenRequest
+          description: chargeOrderAuthorizeWithTokenRequest
+          required: true
+          schema:
+            $ref: '#/definitions/ChargeOrderAuthorizeWithTokenRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ChargeOrderAuthorizeWithTokenResponse'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /payment/session:
+    post:
+      tags:
+        - payment-controller
+      summary: createPaymentSession
+      operationId: createPaymentSessionUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+definitions:
+  AddressModel:
+    type: object
+    properties:
+      addressLine1:
+        type: string
+      addressLine2:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      postalCode:
+        type: string
+      province:
+        type: string
+    title: AddressModel
+  ChargeOrderAuthorizeWithTokenRequest:
+    type: object
+    properties:
+      AccountNumber:
+        type: string
+      ChargeAccountNumberToken:
+        type: string
+      MDN:
+        type: string
+      OrderType:
+        type: integer
+        format: int32
+      OriginatingIPAddress:
+        type: string
+      PDAddressLine1:
+        type: string
+      PDCity:
+        type: string
+      PDCountryCode:
+        type: string
+      PDFirstName:
+        type: string
+      PDLastName:
+        type: string
+      PDPostalCode:
+        type: string
+      PDRegion:
+        type: string
+      PackedData:
+        type: string
+      SessionKey:
+        type: string
+      TaxDetail:
+        type: array
+        items:
+          $ref: '#/definitions/TaxDetail'
+      TotalChargeAmount:
+        type: number
+        format: double
+      TotalTaxAmount:
+        type: number
+        format: double
+      TransactionID:
+        type: string
+      pdAddressLine2:
+        type: string
+    title: ChargeOrderAuthorizeWithTokenRequest
+  ChargeOrderAuthorizeWithTokenResponse:
+    type: object
+    properties:
+      CVNResultCode:
+        type: integer
+        format: int32
+      ChargeAmount:
+        type: number
+        format: double
+      OrderID:
+        type: integer
+        format: int32
+      OrderStatusCD:
+        type: integer
+        format: int32
+      PaymentDeviceTypeCD:
+        type: integer
+        format: int32
+      ResponseCode:
+        type: integer
+        format: int32
+      ResponseText:
+        type: string
+      SessionKey:
+        type: string
+      VestaDeniedResponseCode:
+        type: integer
+        format: int32
+    title: ChargeOrderAuthorizeWithTokenResponse
+  ChargeOrderConfirmWithAnonymousRequest:
+    type: object
+    properties:
+      OrderID:
+        type: string
+      PlatformIntegration:
+        type: string
+      SessionKey:
+        type: string
+    title: ChargeOrderConfirmWithAnonymousRequest
+  PaymentRequest:
+    type: object
+    properties:
+      amount:
+        type: number
+      billingAddress:
+        $ref: '#/definitions/AddressModel'
+      ipAddress:
+        type: string
+      packedData:
+        type: string
+      phoneNumber:
+        type: string
+      sessionKey:
+        type: string
+      taxAmount:
+        type: number
+      taxDetail:
+        type: array
+        items:
+          $ref: '#/definitions/TaxDetail'
+      token:
+        type: string
+    title: PaymentRequest
+  TaxDetail:
+    type: object
+    properties:
+      Amount:
+        type: number
+        format: double
+      Description:
+        type: string
+      TaxTypeCD:
+        type: integer
+        format: int32
+    title: TaxDetail
+  ValidationErrorResponse:
+    type: object
+    properties:
+      errorMessage:
+        type: string
+      field:
+        type: string
+    title: ValidationErrorResponse

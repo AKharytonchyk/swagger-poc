@@ -1,0 +1,283 @@
+swagger: '2.0'
+info:
+  description: Api Documentation
+  version: '1.0'
+  title: Api Documentation
+  termsOfService: 'urn:tos'
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+host: 'localhost:8180'
+basePath: /resource/v1
+tags:
+  - name: available-ctn-controller
+    description: Available CTN Controller
+  - name: sim-number-controller
+    description: Sim Number Controller
+paths:
+  /phoneNumbers:
+    get:
+      tags:
+        - available-ctn-controller
+      summary: getAvailablePhoneNumbers
+      operationId: getAvailablePhoneNumbersUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: count
+          in: query
+          description: count
+          required: true
+          type: integer
+          format: int32
+        - name: numberGroup
+          in: query
+          description: numberGroup
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/phoneNumbers/{phoneNumber}':
+    post:
+      tags:
+        - available-ctn-controller
+      summary: Reserve phone number
+      operationId: reservePhoneNumbersUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: phoneNumber
+          in: path
+          description: phoneNumber
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/AcknowledgmentResponse'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+    put:
+      tags:
+        - available-ctn-controller
+      summary: Change CTN status
+      operationId: changeStatePhoneNumbersUsingPUT
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - in: body
+          name: ctnState
+          description: ctnState
+          required: true
+          schema:
+            type: string
+            enum:
+              - RESERVED
+              - SENT_TO_FULFILLMENT
+        - name: phoneNumber
+          in: path
+          description: phoneNumber
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CTNReservation'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+    delete:
+      tags:
+        - available-ctn-controller
+      summary: markPhoneAsReleased
+      operationId: markPhoneAsReleasedUsingDELETE
+      produces:
+        - '*/*'
+      parameters:
+        - name: action
+          in: query
+          required: true
+          type: string
+          default: delete
+          enum:
+            - delete
+        - name: phoneNumber
+          in: path
+          description: phoneNumber
+          required: true
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      deprecated: false
+  '/phoneNumbers/{phoneNumber}/checkPortInEligibility':
+    get:
+      tags:
+        - available-ctn-controller
+      summary: checkPortInEligibility
+      operationId: checkPortInEligibilityUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: phoneNumber
+          in: path
+          description: phoneNumber
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/EligibleStatus'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sim-number/{iccid}':
+    get:
+      tags:
+        - sim-number-controller
+      summary: verifyICCID
+      operationId: verifyICCIDUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: iccid
+          in: path
+          description: iccid
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/EquipmentStatus'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+definitions:
+  AcknowledgmentResponse:
+    type: object
+    properties:
+      acknowledgement:
+        type: string
+    title: AcknowledgmentResponse
+  CTNReservation:
+    type: object
+    properties:
+      ctn:
+        type: string
+      ctnState:
+        type: string
+        enum:
+          - RESERVED
+          - SENT_TO_FULFILLMENT
+      id:
+        type: integer
+        format: int64
+      timestamp:
+        $ref: '#/definitions/Timestamp'
+    title: CTNReservation
+  EligibleStatus:
+    type: object
+    properties:
+      eligible:
+        type: boolean
+      number:
+        type: string
+      wireless:
+        type: boolean
+    title: EligibleStatus
+  EquipmentStatus:
+    type: object
+    properties:
+      number:
+        type: string
+      status:
+        type: string
+    title: EquipmentStatus
+  ReleasePhoneNumberResponse:
+    type: object
+    properties:
+      released:
+        type: boolean
+    title: ReleasePhoneNumberResponse
+  Timestamp:
+    type: object
+    properties:
+      date:
+        type: integer
+        format: int32
+      day:
+        type: integer
+        format: int32
+      hours:
+        type: integer
+        format: int32
+      minutes:
+        type: integer
+        format: int32
+      month:
+        type: integer
+        format: int32
+      nanos:
+        type: integer
+        format: int32
+      seconds:
+        type: integer
+        format: int32
+      time:
+        type: integer
+        format: int64
+      timezoneOffset:
+        type: integer
+        format: int32
+      year:
+        type: integer
+        format: int32
+    title: Timestamp

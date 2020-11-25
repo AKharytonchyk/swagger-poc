@@ -1,0 +1,479 @@
+swagger: '2.0'
+info:
+  description: Api Documentation
+  version: '1.0'
+  title: Api Documentation
+  termsOfService: 'urn:tos'
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+host: chatr-dev2.dev01.eks.rogers.com
+basePath: /api/v1
+tags:
+  - name: anonymous-top-up-controller
+    description: Anonymous Top Up Controller
+  - name: pages-controller
+    description: Pages Controller
+  - name: subscription-controller
+    description: Subscription Controller
+paths:
+  /pages/top-up:
+    get:
+      tags:
+        - pages-controller
+      summary: getTopUpPage
+      operationId: getTopUpPageUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Accept-Language
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/TopUpPage'
+      deprecated: false
+  /topup/subscription/balance/voucher:
+    post:
+      tags:
+        - anonymous-top-up-controller
+      summary: Voucher card top up
+      operationId: voucherTopUpUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: reCaptchaToken
+          in: query
+          description: reCaptchaToken
+          required: true
+          type: string
+        - name: version
+          in: query
+          description: version
+          required: true
+          type: string
+        - in: body
+          name: voucherTopUpRequest
+          description: voucherTopUpRequest
+          required: true
+          schema:
+            $ref: '#/definitions/VoucherTopUpRequest'
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/VoucherTopUpResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ExternalServiceExceptionResponse'
+      deprecated: false
+  '/topup/subscription/{phoneNumber}':
+    get:
+      tags:
+        - subscription-controller
+      summary: Returns result of phone number verification
+      operationId: getSubscriptionBalanceUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: phoneNumber
+          in: path
+          description: phoneNumber
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/ResponseEntity'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ExternalServiceExceptionResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ExternalServiceExceptionResponse'
+      deprecated: false
+definitions:
+  AlternativeTopUp:
+    type: object
+    properties:
+      steps:
+        type: array
+        items:
+          $ref: '#/definitions/AlternativeTopUpStep'
+      title:
+        type: string
+    title: AlternativeTopUp
+  AlternativeTopUpStep:
+    type: object
+    properties:
+      icon:
+        type: string
+      iconAlt:
+        type: string
+      mobileAppLinks:
+        $ref: '#/definitions/MobileAppButtons'
+      phoneNum:
+        type: string
+      text:
+        type: string
+    title: AlternativeTopUpStep
+  ExternalServiceExceptionResponse:
+    type: object
+    required:
+      - code
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    title: ExternalServiceExceptionResponse
+  MobileAppButtons:
+    type: object
+    properties:
+      ctaInfo:
+        type: array
+        items:
+          $ref: '#/definitions/MobileAppInfo'
+    title: MobileAppButtons
+  MobileAppInfo:
+    type: object
+    properties:
+      alt:
+        type: string
+      applicationPlatform:
+        type: string
+      src:
+        type: string
+      url:
+        type: string
+    title: MobileAppInfo
+  ResponseEntity:
+    type: object
+    properties:
+      body:
+        type: object
+      statusCode:
+        type: string
+        enum:
+          - 100 CONTINUE
+          - 101 SWITCHING_PROTOCOLS
+          - 102 PROCESSING
+          - 103 CHECKPOINT
+          - 200 OK
+          - 201 CREATED
+          - 202 ACCEPTED
+          - 203 NON_AUTHORITATIVE_INFORMATION
+          - 204 NO_CONTENT
+          - 205 RESET_CONTENT
+          - 206 PARTIAL_CONTENT
+          - 207 MULTI_STATUS
+          - 208 ALREADY_REPORTED
+          - 226 IM_USED
+          - 300 MULTIPLE_CHOICES
+          - 301 MOVED_PERMANENTLY
+          - 302 FOUND
+          - 302 MOVED_TEMPORARILY
+          - 303 SEE_OTHER
+          - 304 NOT_MODIFIED
+          - 305 USE_PROXY
+          - 307 TEMPORARY_REDIRECT
+          - 308 PERMANENT_REDIRECT
+          - 400 BAD_REQUEST
+          - 401 UNAUTHORIZED
+          - 402 PAYMENT_REQUIRED
+          - 403 FORBIDDEN
+          - 404 NOT_FOUND
+          - 405 METHOD_NOT_ALLOWED
+          - 406 NOT_ACCEPTABLE
+          - 407 PROXY_AUTHENTICATION_REQUIRED
+          - 408 REQUEST_TIMEOUT
+          - 409 CONFLICT
+          - 410 GONE
+          - 411 LENGTH_REQUIRED
+          - 412 PRECONDITION_FAILED
+          - 413 PAYLOAD_TOO_LARGE
+          - 413 REQUEST_ENTITY_TOO_LARGE
+          - 414 URI_TOO_LONG
+          - 414 REQUEST_URI_TOO_LONG
+          - 415 UNSUPPORTED_MEDIA_TYPE
+          - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+          - 417 EXPECTATION_FAILED
+          - 418 I_AM_A_TEAPOT
+          - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+          - 420 METHOD_FAILURE
+          - 421 DESTINATION_LOCKED
+          - 422 UNPROCESSABLE_ENTITY
+          - 423 LOCKED
+          - 424 FAILED_DEPENDENCY
+          - 425 TOO_EARLY
+          - 426 UPGRADE_REQUIRED
+          - 428 PRECONDITION_REQUIRED
+          - 429 TOO_MANY_REQUESTS
+          - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+          - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+          - 500 INTERNAL_SERVER_ERROR
+          - 501 NOT_IMPLEMENTED
+          - 502 BAD_GATEWAY
+          - 503 SERVICE_UNAVAILABLE
+          - 504 GATEWAY_TIMEOUT
+          - 505 HTTP_VERSION_NOT_SUPPORTED
+          - 506 VARIANT_ALSO_NEGOTIATES
+          - 507 INSUFFICIENT_STORAGE
+          - 508 LOOP_DETECTED
+          - 509 BANDWIDTH_LIMIT_EXCEEDED
+          - 510 NOT_EXTENDED
+          - 511 NETWORK_AUTHENTICATION_REQUIRED
+      statusCodeValue:
+        type: integer
+        format: int32
+    title: ResponseEntity
+  TopUpCancel:
+    type: object
+    properties:
+      cancelCtaAlt:
+        type: string
+      cancelCtaCopy:
+        type: string
+      closeCtaAlt:
+        type: string
+      confirmCtaAlt:
+        type: string
+      confirmCtaCopy:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+    title: TopUpCancel
+  TopUpLabels:
+    type: object
+    properties:
+      accountLabel:
+        type: string
+      failedVoucherLabel:
+        type: string
+      paymentDateLabel:
+        type: string
+      paymentMethodLabel:
+        type: string
+      totalLabel:
+        type: string
+      voucherPinLabel:
+        type: string
+    title: TopUpLabels
+  TopUpPage:
+    type: object
+    properties:
+      metaDescription:
+        type: string
+      metaKeyWords:
+        type: string
+      pageContentRef:
+        $ref: '#/definitions/TopUpPageContent'
+      slug:
+        type: string
+      titleTag:
+        type: string
+    title: TopUpPage
+  TopUpPageContent:
+    type: object
+    properties:
+      alternativeTopUp:
+        $ref: '#/definitions/AlternativeTopUp'
+      topUpStepper:
+        $ref: '#/definitions/TopUpStepper'
+    title: TopUpPageContent
+  TopUpPhoneForm:
+    type: object
+    properties:
+      accountLockedError:
+        type: string
+      backendValidationError:
+        type: string
+      backendValidationSuccess:
+        type: string
+      cleanPhoneAlt:
+        type: string
+      cleanPhoneCopy:
+        type: string
+      completeStepIconAlt:
+        type: string
+      continueAlt:
+        type: string
+      continueCopy:
+        type: string
+      editBtnAlt:
+        type: string
+      editBtnCopy:
+        type: string
+      inputLabel:
+        type: string
+      inputPlaceHolder:
+        type: string
+      stepIconAlt:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+      uiValidationError:
+        type: string
+    title: TopUpPhoneForm
+  TopUpReceipt:
+    type: object
+    properties:
+      carePhone:
+        type: string
+      careText:
+        type: string
+      errorText:
+        type: string
+      errorTitle:
+        type: string
+      labels:
+        $ref: '#/definitions/TopUpLabels'
+      partialErrorText:
+        type: string
+      partialErrorTitle:
+        type: string
+      receiptCareText:
+        type: string
+      receiptText:
+        type: string
+      receiptTitle:
+        type: string
+      receiptTransactionTitle:
+        type: string
+      saveBtnAlt:
+        type: string
+      saveBtnCopy:
+        type: string
+      stepIconAlt:
+        type: string
+      successText:
+        type: string
+      successTitle:
+        type: string
+      title:
+        type: string
+    title: TopUpReceipt
+  TopUpStepper:
+    type: object
+    properties:
+      cancelModal:
+        $ref: '#/definitions/TopUpCancel'
+      phoneForm:
+        $ref: '#/definitions/TopUpPhoneForm'
+      result:
+        $ref: '#/definitions/TopUpReceipt'
+      startNewTopupCtaAlt:
+        type: string
+      startNewTopupCtaCopy:
+        type: string
+      summaryStep:
+        $ref: '#/definitions/TopUpSummary'
+      text:
+        type: string
+      title:
+        type: string
+      vouchersForm:
+        $ref: '#/definitions/TopUpVouchersForm'
+    title: TopUpStepper
+  TopUpSummary:
+    type: object
+    properties:
+      cancelAlt:
+        type: string
+      cancelCopy:
+        type: string
+      completeStepIconAlt:
+        type: string
+      continueAlt:
+        type: string
+      continueCopy:
+        type: string
+      labels:
+        $ref: '#/definitions/TopUpLabels'
+      reCaptchaValidationError:
+        type: string
+      stepIconAlt:
+        type: string
+      successTitle:
+        type: string
+      title:
+        type: string
+    title: TopUpSummary
+  TopUpVouchersForm:
+    type: object
+    properties:
+      addVoucherCtaAlt:
+        type: string
+      addVoucherCtaCopy:
+        type: string
+      cancelAlt:
+        type: string
+      cancelCopy:
+        type: string
+      completeStepIconAlt:
+        type: string
+      continueAlt:
+        type: string
+      continueCopy:
+        type: string
+      deleteVoucherCtaAlt:
+        type: string
+      editBtnAlt:
+        type: string
+      editBtnCopy:
+        type: string
+      stepIconAlt:
+        type: string
+      title:
+        type: string
+      voucherInputLabel:
+        type: string
+      voucherLengthError:
+        type: string
+      voucherRepeatError:
+        type: string
+    title: TopUpVouchersForm
+  Voucher:
+    type: object
+    properties:
+      responseCode:
+        type: integer
+        format: int32
+      voucherPin:
+        type: string
+    title: Voucher
+  VoucherTopUpRequest:
+    type: object
+    properties:
+      phone:
+        type: string
+      vouchers:
+        type: array
+        items:
+          $ref: '#/definitions/Voucher'
+    title: VoucherTopUpRequest
+  VoucherTopUpResponse:
+    type: object
+    properties:
+      invalidVouchers:
+        type: array
+        items:
+          $ref: '#/definitions/Voucher'
+      totalSum:
+        type: number
+    title: VoucherTopUpResponse

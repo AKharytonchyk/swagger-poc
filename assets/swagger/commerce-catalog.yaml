@@ -1,0 +1,337 @@
+swagger: '2.0'
+info:
+  description: Api Documentation
+  version: '1.0'
+  title: Api Documentation
+  termsOfService: 'urn:tos'
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+host: 'localhost:8088'
+basePath: /catalog/v1
+tags:
+  - name: plan-controller
+    description: Plan Controller
+paths:
+  /plans:
+    get:
+      tags:
+        - plan-controller
+      summary: getAllPlans
+      operationId: getAllPlansUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: limit
+          in: query
+          description: limit
+          required: false
+          type: integer
+          format: int64
+        - name: offset
+          in: query
+          description: offset
+          required: false
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Plan'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/plans/cartDiscounts/dataFree/{sku}':
+    get:
+      tags:
+        - plan-controller
+      summary: getCartDiscountDataFree
+      operationId: getCartDiscountDataFreeUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: sku
+          in: path
+          description: sku
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CartDiscountInfo'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /plans/planTypes:
+    get:
+      tags:
+        - plan-controller
+      summary: getAllPlanTypes
+      operationId: getAllPlanTypesUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PlanType'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/plans/{planId}':
+    get:
+      tags:
+        - plan-controller
+      summary: getPlanById
+      operationId: getPlanByIdUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: planId
+          in: path
+          description: planId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Plan'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/plans/{planId}/addons':
+    get:
+      tags:
+        - plan-controller
+      summary: getAvailableAddons
+      operationId: getAvailableAddonsUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: planId
+          in: path
+          description: planId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Addon'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/plans/{planId}/cache-invalidation':
+    get:
+      tags:
+        - plan-controller
+      summary: invalidateCache
+      operationId: invalidateCacheUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: planId
+          in: path
+          description: planId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+definitions:
+  Addon:
+    type: object
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      name:
+        type: string
+    title: Addon
+  AmountInfo:
+    type: object
+    properties:
+      amount:
+        type: number
+        format: double
+      centAmount:
+        type: integer
+        format: int64
+      currency:
+        type: string
+      currencySymbol:
+        type: string
+      formatted:
+        type: string
+      fractionDigits:
+        type: integer
+        format: int32
+    title: AmountInfo
+  CartDiscountInfo:
+    type: object
+    properties:
+      autoPay:
+        type: boolean
+      description:
+        type: string
+      giftProductSkuId:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    title: CartDiscountInfo
+  DataOption:
+    type: object
+    properties:
+      highSpeed:
+        type: string
+      id:
+        type: string
+      key:
+        type: string
+      lowSpeed:
+        type: string
+      name:
+        type: string
+      priceInfo:
+        $ref: '#/definitions/PriceInfo'
+      volumeKey:
+        type: string
+      volumeValue:
+        type: string
+    title: DataOption
+  Plan:
+    type: object
+    properties:
+      addons:
+        type: array
+        items:
+          $ref: '#/definitions/Addon'
+      bonusDataOfferIncluded:
+        type: boolean
+      data:
+        $ref: '#/definitions/DataOption'
+      id:
+        type: string
+      intlTalkSaverIncluded:
+        type: boolean
+      key:
+        type: string
+      name:
+        type: string
+      priceInfo:
+        $ref: '#/definitions/PriceInfo'
+      promos:
+        type: array
+        items:
+          $ref: '#/definitions/CartDiscountInfo'
+      talk:
+        $ref: '#/definitions/TalkOption'
+      text:
+        $ref: '#/definitions/TextOption'
+      type:
+        $ref: '#/definitions/PlanType'
+      voiceMail:
+        $ref: '#/definitions/VoiceMail'
+    title: Plan
+  PlanType:
+    type: object
+    properties:
+      key:
+        type: string
+      name:
+        type: string
+    title: PlanType
+  PriceInfo:
+    type: object
+    properties:
+      listPrice:
+        $ref: '#/definitions/AmountInfo'
+      salePrice:
+        $ref: '#/definitions/AmountInfo'
+      term:
+        type: string
+    title: PriceInfo
+  TalkOption:
+    type: object
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      name:
+        type: string
+      priceInfo:
+        $ref: '#/definitions/PriceInfo'
+      volumeKey:
+        type: string
+      volumeValue:
+        type: string
+    title: TalkOption
+  TextOption:
+    type: object
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      name:
+        type: string
+      priceInfo:
+        $ref: '#/definitions/PriceInfo'
+      volumeKey:
+        type: string
+      volumeValue:
+        type: string
+    title: TextOption
+  VoiceMail:
+    type: object
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      name:
+        type: string
+    title: VoiceMail
